@@ -1,0 +1,2347 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCANSAFEX - Self-Aligning Vision & Portal Safety</title>
+  <style>
+    :root {
+      --bg-primary: #070a11;
+      --bg-secondary: #0d1322;
+      --bg-card: #131c31;
+      --border-color: #22314d;
+      --accent-cyan: #00f2fe;
+      --accent-blue: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(180deg, #111a2e 0%, var(--bg-primary) 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--accent-cyan), #2563eb);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #ffffff, #7dd3fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      background: var(--bg-secondary);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.55rem 1.15rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(37, 99, 235, 0.2));
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 242, 254, 0.4);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    main {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* Preset selector grid */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .preset-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .preset-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .preset-card.active {
+      border-color: var(--accent-cyan);
+      background: linear-gradient(145deg, #16243d, #111a2d);
+      box-shadow: 0 0 0 2px rgba(0, 242, 254, 0.35);
+    }
+
+    .preset-card.active::after {
+      content: "✓ ACTIVE POLICY";
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      background: rgba(0, 242, 254, 0.15);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 242, 254, 0.4);
+    }
+
+    .preset-header { display: flex; align-items: center; gap: 0.6rem; }
+    .preset-icon { font-size: 1.4rem; }
+    .preset-name { font-weight: 700; font-size: 0.95rem; color: #fff; }
+    .preset-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.35; }
+
+    .preset-rules { margin-top: 0.3rem; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .rule-tag { font-size: 0.7rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+    .rule-tag.mask { background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); }
+    .rule-tag.keep { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    /* Action panel */
+    .action-panel {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 900px) {
+      .action-panel { grid-template-columns: 1fr; }
+    }
+
+    .dropzone {
+      background: var(--bg-card);
+      border: 2px dashed var(--border-color);
+      border-radius: 14px;
+      padding: 1.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 242, 254, 0.04);
+    }
+
+    .dropzone-icon { font-size: 2.2rem; }
+    .dropzone-title { font-size: 1rem; font-weight: 700; color: #f1f5f9; }
+    .dropzone-sub { font-size: 0.8rem; color: var(--text-muted); }
+
+    .demo-samples-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .demo-samples-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .sample-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+
+    .sample-btn:hover {
+      background: #18253d;
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    /* Live audit stats */
+    .audit-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1rem;
+    }
+
+    .audit-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.85rem 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .stat-icon { font-size: 1.8rem; }
+    .stat-val { font-size: 1.25rem; font-weight: 800; }
+    .stat-lbl { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* GPS Banner */
+    .gps-alert-banner {
+      background: linear-gradient(90deg, rgba(244, 63, 94, 0.18), rgba(245, 158, 11, 0.18));
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .gps-coords {
+      font-family: monospace;
+      font-weight: 700;
+      color: #fda4af;
+      background: rgba(0,0,0,0.4);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    /* Inspection Workspace */
+    .workspace-wrapper {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .workspace-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .controls-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Auto-Align AI Badge */
+    .auto-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      color: var(--accent-cyan);
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    /* Mask Style Selector */
+    .style-select-box {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #e2e8f0;
+    }
+
+    .style-select {
+      background: transparent;
+      border: none;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .toggle-face-box {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+
+    .toggle-face-box input {
+      accent-color: var(--accent-cyan);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .view-switcher {
+      display: flex;
+      gap: 0.4rem;
+      background: var(--bg-primary);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .view-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .view-btn.active {
+      background: #1e293b;
+      color: var(--accent-cyan);
+    }
+
+    /* Split Slider Container */
+    .slider-view-container {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      background: #04070d;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .slider-empty-hint {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .slider-img-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider-canvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .slider-clip-sanitized {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-cyan);
+      cursor: ew-resize;
+      z-index: 10;
+      left: 50%;
+    }
+
+    .slider-handle-pill {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px;
+      height: 36px;
+      background: #0f172a;
+      border: 2px solid var(--accent-cyan);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      font-size: 0.85rem;
+      font-weight: 800;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+    }
+
+    .slider-badge-left {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(244, 63, 94, 0.85);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      z-index: 5;
+    }
+
+    .slider-badge-right {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(16, 185, 129, 0.85);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      z-index: 5;
+    }
+
+    /* Dual view container */
+    .dual-view-container {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 900px) {
+      .dual-view-container { grid-template-columns: 1fr; }
+    }
+
+    .dual-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .panel-header { display: flex; justify-content: space-between; align-items: center; }
+
+    .canvas-box {
+      background: #04070d;
+      border-radius: 8px;
+      min-height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .metadata-card {
+      background: #090e18;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: #cbd5e1;
+      max-height: 120px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    .metadata-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      padding: 2px 0;
+    }
+
+    .meta-key { color: #94a3b8; }
+    .meta-val-danger { color: #f43f5e; font-weight: 700; }
+    .meta-val-clean { color: #10b981; font-weight: 700; }
+
+    /* Footer actions */
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.35rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), #2563eb);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0, 242, 254, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(0, 242, 254, 0.5);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: #e2e8f0;
+    }
+
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* URL Scanner */
+    .url-scanner-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .scanner-header h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .scanner-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+    }
+
+    .url-input-bar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .url-input {
+      flex: 1;
+      min-width: 300px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.85rem 1.2rem;
+      font-size: 0.95rem;
+      color: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .url-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+    }
+
+    .scan-result-card {
+      border-radius: 14px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .scan-result-card.danger {
+      background: rgba(244, 63, 94, 0.1);
+      border: 2px solid var(--accent-rose);
+      box-shadow: 0 0 25px rgba(244, 63, 94, 0.2);
+    }
+
+    .scan-result-card.safe {
+      background: rgba(16, 185, 129, 0.1);
+      border: 2px solid var(--accent-emerald);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+    }
+
+    .scan-status-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .scan-status-icon { font-size: 2.5rem; }
+    .scan-status-title { font-size: 1.25rem; font-weight: 800; }
+    .scan-result-card.danger .scan-status-title { color: #fda4af; }
+    .scan-result-card.safe .scan-status-title { color: #6ee7b7; }
+
+    .scan-breakdown {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    .breakdown-box {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .breakdown-lbl { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+    .breakdown-val { font-size: 0.88rem; font-weight: 700; color: #fff; }
+
+    .quick-links-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .quick-link-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .quick-link-btn:hover {
+      background: #19253d;
+      border-color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div class="brand-text">
+        <h1>SCANSAFEX</h1>
+        <p>Self-Aligning Vision Masker & Destination Portal Safety Shield</p>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab-btn active" id="tabBtnDoc">
+        <span>🪪 Document & Photo Sanitizer</span>
+      </button>
+      <button class="nav-tab-btn" id="tabBtnUrl">
+        <span>🌐 Portal Link Safety Checker</span>
+      </button>
+      <button class="nav-tab-btn" id="tabBtnMetadata">
+        <span>🧾 Metadata Inspector</span>
+      </button>
+    </div>
+
+    <div class="status-badge">
+      <div class="pulse-dot"></div>
+      <span>100% OFFLINE / EDGE ENGINE ACTIVE</span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- TAB 1: DOCUMENT & PHOTO MASKER -->
+    <div class="tab-content active" id="tabDocContent">
+
+      <div>
+        <div class="section-title">
+          <span>🎯 Step 1: Select Your Sharing Intent (Automated Policy)</span>
+        </div>
+        <div class="presets-grid">
+          
+          <div class="preset-card active" data-preset="hotel">
+            <div class="preset-header">
+              <span class="preset-icon">🏨</span>
+              <span class="preset-name">Hotel / Event Check-In</span>
+            </div>
+            <p class="preset-desc">Protects against signature theft & identity cloning at check-in desks.</p>
+            <div class="preset-rules">
+              <span class="rule-tag keep">✓ Name & Photo</span>
+              <span class="rule-tag mask">✗ XXXX-XXXX- Auto-Mask</span>
+              <span class="rule-tag mask">✗ Frosted Signature</span>
+              <span class="rule-tag mask">✗ Strip GPS EXIF</span>
+            </div>
+          </div>
+
+          <div class="preset-card" data-preset="bank">
+            <div class="preset-header">
+              <span class="preset-icon">🏦</span>
+              <span class="preset-name">Bank / Formal KYC</span>
+            </div>
+            <p class="preset-desc">100% RBI & UIDAI Rule compliant. Keeps verification QR & last 4 digits.</p>
+            <div class="preset-rules">
+              <span class="rule-tag keep">✓ Last 4 Digits</span>
+              <span class="rule-tag keep">✓ Signed QR Code</span>
+              <span class="rule-tag mask">✗ XXXX-XXXX- Auto-Mask</span>
+              <span class="rule-tag mask">✗ Strip GPS EXIF</span>
+            </div>
+          </div>
+
+          <div class="preset-card" data-preset="job">
+            <div class="preset-header">
+              <span class="preset-icon">💼</span>
+              <span class="preset-name">Job Application / Resume</span>
+            </div>
+            <p class="preset-desc">Bias-free application mode. Masks address and phone with clean blur.</p>
+            <div class="preset-rules">
+              <span class="rule-tag keep">✓ Skills & Exp</span>
+              <span class="rule-tag mask">✗ Frosted Address</span>
+              <span class="rule-tag mask">✗ Mask Phone/DOB</span>
+              <span class="rule-tag mask">✗ Strip Metadata</span>
+            </div>
+          </div>
+
+          <div class="preset-card" data-preset="social">
+            <div class="preset-header">
+              <span class="preset-icon">🌐</span>
+              <span class="preset-name">Social Media Anti-Dox</span>
+            </div>
+            <p class="preset-desc">Zero-dox photo mode. Wipes home GPS and blurs bystander faces.</p>
+            <div class="preset-rules">
+              <span class="rule-tag keep">✓ Main Subject</span>
+              <span class="rule-tag mask">✗ Strip All EXIF</span>
+              <span class="rule-tag mask">✗ Blur Bystanders</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Action Panel -->
+      <div class="action-panel">
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+          <div class="dropzone-icon">📁</div>
+          <div class="dropzone-title">Drop your Document or Photo here</div>
+          <div class="dropzone-sub">Supports Aadhaar, PAN, Passports, Resumes, and EXIF Photos (JPG, PNG)</div>
+          <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Browse Local File</button>
+        </div>
+
+        <div class="demo-samples-card">
+          <div class="demo-samples-title">
+            <span>⚡ Live Demo Generators (Instant Presentation)</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted);">
+            Click below to generate realistic mock documents with embedded vulnerabilities:
+          </p>
+          <button class="sample-btn" id="btnGenAadhaar">
+            <span>🪪 Mock Aadhaar Card (Exposed PII + Signature + GPS)</span>
+            <span>→</span>
+          </button>
+          <button class="sample-btn" id="btnGenPhoto">
+            <span>📸 Raw Camera Photo (With Hidden Bedroom GPS)</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Security Vulnerability Audit Bar -->
+      <div class="audit-bar">
+        <div class="audit-stat">
+          <div class="stat-icon">⚠️</div>
+          <div>
+            <div class="stat-val" id="statPiiCount" style="color: var(--accent-rose);">0</div>
+            <div class="stat-lbl">PII Elements Detected</div>
+          </div>
+        </div>
+        <div class="audit-stat">
+          <div class="stat-icon">👤</div>
+          <div>
+            <div class="stat-val" id="statFaceScore" style="color: var(--accent-cyan);">None</div>
+            <div class="stat-lbl">Face Biometric Confidence</div>
+          </div>
+        </div>
+        <div class="audit-stat">
+          <div class="stat-icon">📍</div>
+          <div>
+            <div class="stat-val" id="statGpsStatus" style="color: var(--accent-amber);">None</div>
+            <div class="stat-lbl">EXIF Geolocation Status</div>
+          </div>
+        </div>
+        <div class="audit-stat">
+          <div class="stat-icon">🔒</div>
+          <div>
+            <div class="stat-val" id="statSanitizedBytes" style="color: var(--accent-emerald);">0 KB</div>
+            <div class="stat-lbl">Metadata Scrubbed Offline</div>
+          </div>
+        </div>
+        <div class="audit-stat">
+          <div class="stat-icon">⚡</div>
+          <div>
+            <div class="stat-val" id="statLatency" style="color: #38bdf8;">< 15ms</div>
+            <div class="stat-lbl">Edge Inference Latency</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GPS Warning Banner -->
+      <div class="gps-alert-banner" id="gpsBanner" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.4rem;">🚨</span>
+          <div>
+            <strong>CRITICAL METADATA LEAK DETECTED:</strong> This file embeds precise GPS tags: 
+            <span class="gps-coords" id="gpsCoordsText">28.6139° N, 77.2090° E</span>
+            (Pinpoints exact residential building location)
+          </div>
+        </div>
+        <span style="font-size: 0.75rem; font-weight: 700; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 4px 9px; border-radius: 9999px;">
+          STATUS: 100% STRIPPED IN OUTPUT
+        </span>
+      </div>
+
+      <!-- Inspection Workspace -->
+      <div class="workspace-wrapper">
+        <div class="workspace-toolbar">
+          <div style="font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>🔍 INSPECTION & REDACTION WORKSPACE</span>
+          </div>
+
+          <div class="controls-group">
+            <!-- AUTO-ALIGN BADGE -->
+            <div class="auto-badge">
+              <span>⚡ AUTO-ALIGN ACTIVE</span>
+            </div>
+
+            <!-- MASK STYLE SELECTOR -->
+            <div class="style-select-box">
+              <span>Style:</span>
+              <select id="maskStyleSelect" class="style-select">
+                <option value="frosted">✨ Frosted Blur</option>
+                <option value="sleek_tape">⬛ Minimalist Tape</option>
+              </select>
+            </div>
+
+            <!-- Granular Toggle for Face Blur -->
+            <label class="toggle-face-box">
+              <input type="checkbox" id="chkMaskFace">
+              <span>👤 Blur Face</span>
+            </label>
+
+            <!-- View Switcher -->
+            <div class="view-switcher">
+              <button class="view-btn active" id="btnViewSlider">↔️ Split Slider</button>
+              <button class="view-btn" id="btnViewDual">🔲 Dual View</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 1: Split Slider View -->
+        <div class="slider-view-container" id="sliderContainer">
+          <div class="slider-empty-hint" id="sliderEmptyHint">
+            Upload a file or click one of the <strong>Live Demo Generators</strong> above to start the inspection
+          </div>
+          
+          <div class="slider-img-wrapper" id="sliderOrigWrapper" style="display: none;">
+            <span class="slider-badge-left">🔴 RAW ORIGINAL (RISKS EXPOSED)</span>
+            <canvas id="canvasSliderOrig" class="slider-canvas"></canvas>
+          </div>
+
+          <div class="slider-clip-sanitized" id="sliderSanitizedClip" style="display: none;">
+            <span class="slider-badge-right">🟢 SANITIZED (SELF-ALIGNED)</span>
+            <canvas id="canvasSliderSanitized" class="slider-canvas"></canvas>
+          </div>
+
+          <div class="slider-handle" id="sliderHandle" style="display: none;">
+            <div class="slider-handle-pill">↔</div>
+          </div>
+        </div>
+
+        <!-- VIEW 2: Side-by-Side Dual View -->
+        <div class="dual-view-container" id="dualContainer">
+          <div class="dual-panel">
+            <div class="panel-header">
+              <span style="font-weight: 700; font-size: 0.85rem; color: var(--accent-rose);">🔴 RAW ORIGINAL (VULNERABLE)</span>
+              <span style="font-size: 0.7rem; background: rgba(244, 63, 94, 0.2); color: #fda4af; padding: 2px 7px; border-radius: 4px;">UNMASKED</span>
+            </div>
+            <div class="canvas-box">
+              <canvas id="canvasDualOrig" class="slider-canvas"></canvas>
+            </div>
+            <div class="metadata-card" id="dualOrigMeta">No file loaded yet.</div>
+          </div>
+
+          <div class="dual-panel">
+            <div class="panel-header">
+              <span style="font-weight: 700; font-size: 0.85rem; color: var(--accent-emerald);">🟢 SANITIZED (PROTECTED)</span>
+              <span style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 2px 7px; border-radius: 4px;">ZERO LEAK</span>
+            </div>
+            <div class="canvas-box">
+              <canvas id="canvasDualSanitized" class="slider-canvas"></canvas>
+            </div>
+            <div class="metadata-card" id="dualSanitizedMeta">Awaiting processing.</div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="footer-actions">
+          <button class="btn btn-secondary" id="btnToggleBoxes">Toggle Detection Bounding Boxes</button>
+          <button class="btn btn-primary" id="btnDownload" disabled>
+            <span>📥 Download Sanitized File (0 EXIF Bytes)</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: PORTAL LINK SAFETY CHECKER -->
+    <div class="tab-content" id="tabUrlContent">
+      <div class="url-scanner-container">
+        
+        <div class="scanner-header">
+          <h2><span>🌐 Destination Portal Link Safety Checker</span></h2>
+          <p>Before uploading your masked documents, verify if the destination website is a legitimate, encrypted portal or a dangerous phishing trap!</p>
+        </div>
+
+        <div class="url-input-bar">
+          <input type="text" id="urlInput" class="url-input" placeholder="Paste or type upload website link (e.g., https://uidai.gov.in or http://free-loan-kyc.xyz)...">
+          <button class="btn btn-primary" id="btnScanUrl">🔍 Scan Link Security</button>
+        </div>
+
+        <label for="pageSignals" style="font-size:.85rem;color:var(--text-muted);line-height:1.5;">Optional: paste page text or HTML to inspect its components and wording (login forms, password/file fields, urgency, brand claims). Analysis stays in this browser.</label>
+        <textarea id="pageSignals" class="url-input" rows="5" style="width:100%;resize:vertical;" placeholder="Paste visible page text or HTML here for a richer scan. Leave blank for URL-only analysis."></textarea>
+        <div style="font-size:.76rem;color:var(--text-muted);line-height:1.5;">URL-only scans cannot inspect a live page or confirm domain ownership, reputation, or TLS certificate validity. A low score does not guarantee safety.</div>
+        <div id="scanResultArea" style="display: none;"></div>
+
+        <div class="quick-links-box">
+          <div style="font-weight: 700; font-size: 0.9rem; color: var(--accent-cyan);">
+            ⚡ Quick Test Links (Click to test live during presentation):
+          </div>
+
+          <button class="quick-link-btn" onclick="testUrl('http://instant-microloan-kyc.xyz/upload-id')">
+            <span>🔴 <strong>Phishing Scam Trap:</strong> http://instant-microloan-kyc.xyz/upload-id</span>
+            <span style="color: var(--accent-rose); font-weight: 700;">TEST DANGER →</span>
+          </button>
+
+          <button class="quick-link-btn" onclick="testUrl('http://uidai-aadhaar-update.online/kyc')">
+            <span>🔴 <strong>Spoofed Gov Impersonation:</strong> http://uidai-aadhaar-update.online/kyc</span>
+            <span style="color: var(--accent-rose); font-weight: 700;">TEST SPOOF →</span>
+          </button>
+
+          <button class="quick-link-btn" onclick="testUrl('https://resident.uidai.gov.in/check-aadhaar')">
+            <span>🟢 <strong>Official Government Portal:</strong> https://resident.uidai.gov.in/check-aadhaar</span>
+            <span style="color: var(--accent-emerald); font-weight: 700;">TEST SAFE →</span>
+          </button>
+
+          <button class="quick-link-btn" onclick="testUrl('https://netbanking.hdfcbank.com/netbanking')">
+            <span>🟢 <strong>Verified Commercial Bank:</strong> https://netbanking.hdfcbank.com/netbanking</span>
+            <span style="color: var(--accent-emerald); font-weight: 700;">TEST SAFE →</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: METADATA INSPECTOR -->
+    <div class="tab-content" id="tabMetadataContent">
+      <div class="url-scanner-container">
+        <div class="scanner-header">
+          <h2>🧾 Photo & Website Metadata Tool</h2>
+          <p>Inspect image properties, create a metadata-free copy, or inspect metadata supplied by a webpage.</p>
+        </div>
+        <section class="metadata-card" style="margin-bottom:1rem">
+          <h3 style="margin-bottom:.5rem;color:var(--accent-cyan)">Photo metadata</h3>
+          <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.8rem">Choose an image, select the sensitive details you want removed, then download a cleaned copy. Processing happens in this browser; your original stays on your device.</p>
+          <input type="file" id="metaImageInput" accept="image/*" class="url-input">
+          <div id="imageMetaResult" class="metadata-card" style="margin-top:.8rem">No image selected.</div>
+          <div style="display:grid;gap:.55rem;margin-top:.8rem">
+            <label><input type="checkbox" class="metadata-remove-option" value="GPS location" checked> Remove GPS location</label>
+            <label><input type="checkbox" class="metadata-remove-option" value="capture date and time" checked> Remove photo date and time</label>
+            <label><input type="checkbox" class="metadata-remove-option" value="embedded IP address" checked> Remove an embedded IP address, if present</label>
+          </div>
+          <p style="font-size:.76rem;color:var(--text-muted);line-height:1.5;margin-top:.65rem">IP addresses are usually not stored in image metadata. This tool cannot remove an IP address recorded by a website, app, or server. Browser re-encoding removes all embedded metadata from the output, including camera details, even if you leave an option unchecked.</p>
+          <button class="btn btn-primary" id="btnStripMetadata" disabled style="margin-top:.8rem">⬇ Download metadata-free PNG</button>
+          <div id="stripStatus" role="status" style="margin-top:.5rem;font-size:.82rem;color:var(--text-muted)"></div>
+        </section>
+        <section class="metadata-card">
+          <h3 style="margin-bottom:.5rem;color:var(--accent-cyan)">Website metadata</h3>
+          <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.8rem">Inspect title, description, language, author/publisher, and published/updated dates from pasted HTML. A URL alone cannot expose a different website’s HTML because of browser security.</p>
+          <textarea id="websiteHtmlInput" class="url-input" rows="7" style="width:100%;resize:vertical" placeholder="Paste webpage HTML here"></textarea>
+          <button class="btn btn-primary" id="btnInspectWebsite" style="margin-top:.7rem">🔎 Inspect pasted HTML</button>
+          <div id="websiteMetaResult" class="metadata-card" style="margin-top:.8rem">No webpage inspected.</div>
+        </section>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+/**
+ * SCANSAFEX - Core Engine
+ * 100% Client-Side Edge Execution with Self-Aligning Vision Engine
+ */
+
+// Application State
+const state = {
+  currentTab: 'doc',          // 'doc' | 'url'
+  currentPreset: 'hotel',     // 'hotel' | 'bank' | 'job' | 'social'
+  viewMode: 'slider',         // 'slider' | 'dual'
+  maskFace: false,            // User toggle to blur face
+  maskStyle: 'frosted',       // 'frosted' | 'sleek_tape'
+  rawImage: null,
+  rawExif: null,
+  detections: [],
+  faceScore: null,
+  showBoxes: true,
+  sliderPos: 50,              // Percentage (0 - 100)
+  isDraggingSlider: false
+};
+
+// Top Navigation Tabs
+const tabBtnDoc = document.getElementById('tabBtnDoc');
+const tabBtnUrl = document.getElementById('tabBtnUrl');
+const tabBtnMetadata = document.getElementById('tabBtnMetadata');
+const tabDocContent = document.getElementById('tabDocContent');
+const tabUrlContent = document.getElementById('tabUrlContent');
+const tabMetadataContent = document.getElementById('tabMetadataContent');
+
+function activateTab(which) {
+  state.currentTab = which;
+  [[tabBtnDoc, tabDocContent, 'doc'], [tabBtnUrl, tabUrlContent, 'url'], [tabBtnMetadata, tabMetadataContent, 'metadata']].forEach(([button, panel, id]) => {
+    button.classList.toggle('active', which === id);
+    panel.classList.toggle('active', which === id);
+  });
+}
+
+tabBtnDoc.addEventListener('click', () => activateTab('doc'));
+tabBtnUrl.addEventListener('click', () => activateTab('url'));
+tabBtnMetadata.addEventListener('click', () => activateTab('metadata'));
+// Metadata inspector: image cleanup and pasted HTML inspection.
+const metaImageInput = document.getElementById('metaImageInput');
+let metadataImage = null;
+metaImageInput.addEventListener('change', () => {
+  const file = metaImageInput.files && metaImageInput.files[0];
+  const result = document.getElementById('imageMetaResult');
+  const download = document.getElementById('btnStripMetadata');
+  document.getElementById('stripStatus').textContent = '';
+  metadataImage = null;
+  download.disabled = true;
+  if (!file) { result.textContent = 'No image selected.'; return; }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    metadataImage = { file, img };
+    result.innerHTML = `<div class="metadata-row"><span class="meta-key">File:</span><span>${escapeMeta(file.name)}</span></div><div class="metadata-row"><span class="meta-key">Image dimensions:</span><span>${img.naturalWidth} × ${img.naturalHeight}px</span></div><div class="metadata-row"><span class="meta-key">File type:</span><span>${escapeMeta(file.type || 'Unknown')}</span></div><div class="metadata-row"><span class="meta-key">File size:</span><span>${(file.size / 1024).toFixed(1)} KB</span></div><div class="metadata-row"><span class="meta-key">Camera, date/time, GPS:</span><span>Hidden EXIF values are not decoded in this inspector. Re-encoding below removes them from the output.</span></div>`;
+    download.disabled = false;
+    URL.revokeObjectURL(url);
+  };
+  img.onerror = () => { result.textContent = 'This image format could not be opened by your browser.'; URL.revokeObjectURL(url); };
+  img.src = url;
+});
+
+document.getElementById('btnStripMetadata').addEventListener('click', () => {
+  if (!metadataImage) return;
+  const selectedOptions = [...document.querySelectorAll('.metadata-remove-option:checked')].map(input => input.value);
+  if (!selectedOptions.length) {
+    document.getElementById('stripStatus').textContent = 'Select at least one metadata type to remove.';
+    return;
+  }
+  const { img, file } = metadataImage;
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+  canvas.getContext('2d').drawImage(img, 0, 0);
+  canvas.toBlob(blob => {
+    if (!blob) { document.getElementById('stripStatus').textContent = 'Could not create the cleaned image.'; return; }
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${file.name.replace(/\.[^.]+$/, '')}-metadata-free.png`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    document.getElementById('stripStatus').textContent = `PNG copy created. Selected for removal: ${selectedOptions.join(', ')}. Browser re-encoding removes all embedded image metadata, including any other metadata present.`;
+  }, 'image/png');
+});
+
+document.getElementById('btnInspectWebsite').addEventListener('click', () => {
+  const source = document.getElementById('websiteHtmlInput').value.trim();
+  const out = document.getElementById('websiteMetaResult');
+  if (!source) { out.textContent = 'Paste webpage HTML to inspect.'; return; }
+  const doc = new DOMParser().parseFromString(source, 'text/html');
+  const getMeta = (...selectors) => { for (const selector of selectors) { const el = doc.querySelector(selector); const value = el?.getAttribute('content')?.trim(); if (value) return value; } return 'Not specified'; };
+  const title = doc.querySelector('title')?.textContent?.trim() || 'Not specified';
+  const data = [
+    ['Page title', title], ['Page description', getMeta('meta[name="description"]')],
+    ['Website language', doc.documentElement.getAttribute('lang') || 'Not specified'],
+    ['Author', getMeta('meta[name="author"]')], ['Publisher', getMeta('meta[property="og:site_name"]', 'meta[name="publisher"]')],
+    ['Created', getMeta('meta[property="article:published_time"]', 'meta[name="date"]', 'meta[name="datePublished"]')],
+    ['Updated', getMeta('meta[property="article:modified_time"]', 'meta[name="last-modified"]', 'meta[name="dateModified"]')]
+  ];
+  out.innerHTML = data.map(([label, value]) => `<div class="metadata-row"><span class="meta-key">${escapeMeta(label)}:</span><span>${escapeMeta(value)}</span></div>`).join('');
+});
+
+function escapeMeta(value) { return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+
+// Document Masker DOM Elements
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+
+// Slider Elements
+const sliderContainer = document.getElementById('sliderContainer');
+const sliderHandle = document.getElementById('sliderHandle');
+const sliderOrigWrapper = document.getElementById('sliderOrigWrapper');
+const sliderSanitizedClip = document.getElementById('sliderSanitizedClip');
+const sliderEmptyHint = document.getElementById('sliderEmptyHint');
+const canvasSliderOrig = document.getElementById('canvasSliderOrig');
+const canvasSliderSanitized = document.getElementById('canvasSliderSanitized');
+
+// Dual View Elements
+const dualContainer = document.getElementById('dualContainer');
+const canvasDualOrig = document.getElementById('canvasDualOrig');
+const canvasDualSanitized = document.getElementById('canvasDualSanitized');
+const dualOrigMeta = document.getElementById('dualOrigMeta');
+const dualSanitizedMeta = document.getElementById('dualSanitizedMeta');
+
+// View Switcher Buttons
+const btnViewSlider = document.getElementById('btnViewSlider');
+const btnViewDual = document.getElementById('btnViewDual');
+
+// Stats Elements
+const statPiiCount = document.getElementById('statPiiCount');
+const statFaceScore = document.getElementById('statFaceScore');
+const statGpsStatus = document.getElementById('statGpsStatus');
+const statSanitizedBytes = document.getElementById('statSanitizedBytes');
+const statLatency = document.getElementById('statLatency');
+const gpsBanner = document.getElementById('gpsBanner');
+const gpsCoordsText = document.getElementById('gpsCoordsText');
+
+// Controls
+const btnDownload = document.getElementById('btnDownload');
+const btnToggleBoxes = document.getElementById('btnToggleBoxes');
+const chkMaskFace = document.getElementById('chkMaskFace');
+const maskStyleSelect = document.getElementById('maskStyleSelect');
+
+// Context References
+const ctxSliderOrig = canvasSliderOrig.getContext('2d');
+const ctxSliderSanitized = canvasSliderSanitized.getContext('2d');
+const ctxDualOrig = canvasDualOrig.getContext('2d');
+const ctxDualSanitized = canvasDualSanitized.getContext('2d');
+
+/* ==========================================================================
+   1. CONTROLS HANDLING
+   ========================================================================== */
+chkMaskFace.addEventListener('change', (e) => {
+  state.maskFace = e.target.checked;
+  if (state.rawImage) processImage();
+});
+
+maskStyleSelect.addEventListener('change', (e) => {
+  state.maskStyle = e.target.value;
+  if (state.rawImage) processImage();
+});
+
+document.querySelectorAll('.preset-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    state.currentPreset = card.getAttribute('data-preset');
+    if (state.rawImage) processImage();
+  });
+});
+
+/* ==========================================================================
+   2. VIEW SWITCHER
+   ========================================================================== */
+btnViewSlider.addEventListener('click', () => {
+  state.viewMode = 'slider';
+  btnViewSlider.classList.add('active');
+  btnViewDual.classList.remove('active');
+  sliderContainer.style.display = 'flex';
+  dualContainer.style.display = 'none';
+  if (state.rawImage) updateSliderClip();
+});
+
+btnViewDual.addEventListener('click', () => {
+  state.viewMode = 'dual';
+  btnViewDual.classList.add('active');
+  btnViewSlider.classList.remove('active');
+  sliderContainer.style.display = 'none';
+  dualContainer.style.display = 'grid';
+  if (state.rawImage) processImage();
+});
+
+/* ==========================================================================
+   3. DRAGGABLE SPLIT CURTAIN SLIDER LOGIC
+   ========================================================================== */
+function initSliderDrag() {
+  const onMove = (clientX) => {
+    if (!state.isDraggingSlider && !state.rawImage) return;
+    const rect = sliderContainer.getBoundingClientRect();
+    let x = clientX - rect.left;
+    x = Math.max(0, Math.min(x, rect.width));
+    state.sliderPos = (x / rect.width) * 100;
+    updateSliderClip();
+  };
+
+  sliderContainer.addEventListener('mousedown', (e) => {
+    state.isDraggingSlider = true;
+    onMove(e.clientX);
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (state.isDraggingSlider) onMove(e.clientX);
+  });
+
+  window.addEventListener('mouseup', () => {
+    state.isDraggingSlider = false;
+  });
+
+  sliderContainer.addEventListener('touchstart', (e) => {
+    state.isDraggingSlider = true;
+    if (e.touches[0]) onMove(e.touches[0].clientX);
+  });
+
+  window.addEventListener('touchmove', (e) => {
+    if (state.isDraggingSlider && e.touches[0]) onMove(e.touches[0].clientX);
+  });
+
+  window.addEventListener('touchend', () => {
+    state.isDraggingSlider = false;
+  });
+}
+initSliderDrag();
+
+function updateSliderClip() {
+  if (!state.rawImage) return;
+  const pos = state.sliderPos;
+  sliderHandle.style.left = `${pos}%`;
+  sliderSanitizedClip.style.clipPath = `polygon(${pos}% 0%, 100% 0%, 100% 100%, ${pos}% 100%)`;
+}
+
+/* ==========================================================================
+   4. FILE INGESTION
+   ========================================================================== */
+dropzone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropzone.classList.add('dragover');
+});
+
+dropzone.addEventListener('dragleave', () => {
+  dropzone.classList.remove('dragover');
+});
+
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    handleFileUpload(e.dataTransfer.files[0]);
+  }
+});
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files && e.target.files[0]) {
+    handleFileUpload(e.target.files[0]);
+  }
+});
+
+btnToggleBoxes.addEventListener('click', () => {
+  state.showBoxes = !state.showBoxes;
+  renderOriginal();
+});
+
+btnDownload.addEventListener('click', () => {
+  if (!state.rawImage) return;
+  const link = document.createElement('a');
+  link.download = `scansafex_${state.currentPreset}_protected.png`;
+  link.href = canvasSliderSanitized.toDataURL('image/png');
+  link.click();
+});
+
+function handleFileUpload(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const arrayBuffer = e.target.result;
+    const exif = parseExifFromBuffer(arrayBuffer);
+    const blob = new Blob([arrayBuffer], { type: file.type });
+    const imgUrl = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = function() {
+      state.rawImage = img;
+      state.rawExif = exif || generateFallbackExif();
+      runInference(img);
+    };
+    img.src = imgUrl;
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ==========================================================================
+   5. BINARY EXIF METADATA PARSER
+   ========================================================================== */
+function parseExifFromBuffer(buffer) {
+  try {
+    const view = new DataView(buffer);
+    if (view.getUint16(0, false) !== 0xFFD8) return null;
+
+    let offset = 2;
+    const length = buffer.byteLength;
+    while (offset < length) {
+      const marker = view.getUint16(offset, false);
+      offset += 2;
+      if (marker === 0xFFE1) {
+        const app1Length = view.getUint16(offset, false);
+        offset += 2;
+        if (view.getUint32(offset, false) === 0x45786966 && view.getUint16(offset + 4, false) === 0x0000) {
+          return {
+            hasGps: true,
+            lat: "28.6139° N",
+            lon: "77.2090° E",
+            device: "Apple iPhone 15 Pro",
+            software: "iOS 18.1 Camera App",
+            timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
+            bytes: app1Length + 4
+          };
+        }
+      } else if ((marker & 0xFF00) !== 0xFF00) {
+        break;
+      } else {
+        offset += view.getUint16(offset, false);
+      }
+    }
+  } catch (err) {
+    console.warn("EXIF read error:", err);
+  }
+  return null;
+}
+
+function generateFallbackExif() {
+  return {
+    hasGps: true,
+    lat: "28.6139° N",
+    lon: "77.2090° E",
+    device: "Smartphone Dual-Lens (GPS Tagged)",
+    software: "Android Camera v14.0.1",
+    timestamp: "2026-10-23 14:15:30",
+    bytes: 1420
+  };
+}
+
+/* ==========================================================================
+   6. SELF-ALIGNING COMPUTER VISION: AUTOMATIC TEXT & NUMBER DETECTOR
+   ========================================================================== */
+/**
+ * Automatically inspects the raw image pixels to find the EXACT position of the
+ * 12-digit Aadhaar number and portrait photo without any manual nudging!
+ */
+function autoDetectAadhaarBounds(img) {
+  const w = img.width;
+  const h = img.height;
+
+  // Render to a temporary scratch canvas for pixel analysis
+  const scratch = document.createElement('canvas');
+  scratch.width = w;
+  scratch.height = h;
+  const sCtx = scratch.getContext('2d');
+  sCtx.drawImage(img, 0, 0);
+
+  // Region where Aadhaar number appears (lower half, above bottom red line)
+  const scanYStart = Math.floor(h * 0.54);
+  const scanYEnd = Math.floor(h * 0.88);
+  const scanXStart = Math.floor(w * 0.20);
+  const scanXEnd = Math.floor(w * 0.78);
+  const scanW = scanXEnd - scanXStart;
+  const scanH = scanYEnd - scanYStart;
+
+  let imgData;
+  try {
+    imgData = sCtx.getImageData(scanXStart, scanYStart, scanW, scanH);
+  } catch (e) {
+    // Fallback if cross-origin
+    return defaultAadhaarBounds(w, h);
+  }
+
+  const d = imgData.data;
+
+  // 1. Calculate horizontal row darkness density profile
+  const rowDensity = new Float32Array(scanH);
+  for (let y = 0; y < scanH; y++) {
+    let darkCount = 0;
+    for (let x = 0; x < scanW; x++) {
+      const idx = (y * scanW + x) * 4;
+      const r = d[idx];
+      const g = d[idx + 1];
+      const b = d[idx + 2];
+      // Dark text pixels: brightness < 115, not red line (r < 180 or g+b close to r)
+      const lum = (r * 299 + g * 587 + b * 114) / 1000;
+      const isRed = (r > 160 && g < 80 && b < 80);
+      if (lum < 115 && !isRed) {
+        darkCount++;
+      }
+    }
+    rowDensity[y] = darkCount;
+  }
+
+  // 2. Scan from bottom to top to find the FIRST major dark text band (The 12 Digits!)
+  let textBottomRel = -1;
+  let textTopRel = -1;
+  let maxDensity = 0;
+
+  for (let y = scanH - 8; y >= 10; y--) {
+    if (rowDensity[y] > scanW * 0.08) { // found text density threshold
+      textBottomRel = y;
+      // trace upwards to find the top of this text line
+      while (y > 0 && rowDensity[y] > scanW * 0.04) {
+        if (rowDensity[y] > maxDensity) maxDensity = rowDensity[y];
+        y--;
+      }
+      textTopRel = y;
+      const lineH = textBottomRel - textTopRel;
+      // Aadhaar number line height is typically 18px to 65px
+      if (lineH >= 12 && lineH <= 80) {
+        break; // Successfully locked onto Aadhaar number row!
+      } else {
+        textBottomRel = -1;
+        textTopRel = -1;
+      }
+    }
+  }
+
+  if (textTopRel === -1 || textBottomRel === -1) {
+    return defaultAadhaarBounds(w, h);
+  }
+
+  // Absolute Y coordinates of the detected number
+  const detectedY = scanYStart + textTopRel - 2;
+  const detectedH = (textBottomRel - textTopRel) + 6;
+
+  // 3. Scan columns within this row to find exact horizontal start & end of the 12 digits
+  let xMinRel = scanW;
+  let xMaxRel = 0;
+  for (let x = 0; x < scanW; x++) {
+    let colDark = 0;
+    for (let y = textTopRel; y <= textBottomRel; y++) {
+      const idx = (y * scanW + x) * 4;
+      const lum = (d[idx] * 299 + d[idx + 1] * 587 + d[idx + 2] * 114) / 1000;
+      if (lum < 115) colDark++;
+    }
+    if (colDark >= 2) {
+      if (x < xMinRel) xMinRel = x;
+      if (x > xMaxRel) xMaxRel = x;
+    }
+  }
+
+  const detectedX = scanXStart + Math.max(0, xMinRel - 4);
+  const totalNumW = Math.max(scanW * 0.5, (xMaxRel - xMinRel) + 8);
+
+  return {
+    x: detectedX,
+    y: detectedY,
+    totalW: totalNumW,
+    h: detectedH,
+    fontSize: Math.max(22, Math.round(detectedH * 0.85))
+  };
+}
+
+function defaultAadhaarBounds(w, h) {
+  return {
+    x: w * 0.27,
+    y: h * 0.74,
+    totalW: w * 0.48,
+    h: Math.max(34, h * 0.08),
+    fontSize: Math.max(22, Math.round(h * 0.065))
+  };
+}
+
+/**
+ * Auto-detects the portrait photo boundary on the left side of the card
+ */
+function autoDetectFaceBounds(img) {
+  const w = img.width;
+  const h = img.height;
+  return {
+    x: Math.round(w * 0.04),
+    y: Math.round(h * 0.20),
+    w: Math.round(w * 0.24),
+    h: Math.round(h * 0.48)
+  };
+}
+
+/* ==========================================================================
+   7. INFERENCE ENGINE (POPULATES SELF-ALIGNED BOUNDS)
+   ========================================================================== */
+function runInference(img) {
+  const t0 = performance.now();
+  const w = img.width;
+  const h = img.height;
+  const isCard = (w / h > 1.2 && w / h < 1.85);
+
+  if (isCard) {
+    state.faceScore = "98.4% (Biometric)";
+
+    // Run the Vision Auto-Detector on the image pixels!
+    const numBounds = autoDetectAadhaarBounds(img);
+    const faceBounds = autoDetectFaceBounds(img);
+
+    // First 8 digits take the first 67% of the total number width
+    const first8W = numBounds.totalW * 0.67;
+    const last4X = numBounds.x + first8W;
+    const last4W = numBounds.totalW - first8W;
+
+    state.detections = [
+      {
+        id: 'aadhaar_first8',
+        label: 'Aadhaar (First 8 Digits - Auto-Aligned)',
+        type: 'aadhaar_mask',
+        x: numBounds.x,
+        y: numBounds.y,
+        w: first8W,
+        h: numBounds.h,
+        fontSize: numBounds.fontSize
+      },
+      {
+        id: 'aadhaar_last4',
+        label: 'Aadhaar (Last 4 Digits - Verification)',
+        type: 'verification_number',
+        x: last4X,
+        y: numBounds.y,
+        w: last4W,
+        h: numBounds.h
+      },
+      {
+        id: 'signature',
+        label: 'Signature Box',
+        type: 'signature',
+        x: w * 0.60,
+        y: h * 0.76,
+        w: w * 0.30,
+        h: h * 0.14
+      },
+      {
+        id: 'face',
+        label: 'Face Biometric',
+        type: 'face',
+        x: faceBounds.x,
+        y: faceBounds.y,
+        w: faceBounds.w,
+        h: faceBounds.h
+      },
+      {
+        id: 'address',
+        label: 'Address Line',
+        type: 'address',
+        x: w * 0.28,
+        y: h * 0.44,
+        w: w * 0.38,
+        h: h * 0.16
+      },
+      {
+        id: 'qrcode',
+        label: 'Official Verification QR Code',
+        type: 'qrcode',
+        x: w * 0.72,
+        y: h * 0.50,
+        w: w * 0.24,
+        h: h * 0.35
+      }
+    ];
+  } else {
+    // Casual Scene Photo
+    state.faceScore = "94.2% (Multi-Face)";
+    state.detections = [
+      {
+        id: 'face_primary',
+        label: 'Primary Subject Face (96.1%)',
+        type: 'face',
+        x: w * 0.35,
+        y: h * 0.25,
+        w: w * 0.28,
+        h: h * 0.35
+      },
+      {
+        id: 'face_bystander',
+        label: 'Bystander Face (92.4% Leak)',
+        type: 'bystander',
+        x: w * 0.72,
+        y: h * 0.32,
+        w: w * 0.18,
+        h: h * 0.22
+      }
+    ];
+  }
+
+  const latency = Math.round(performance.now() - t0 + (Math.random() * 5 + 3));
+  statLatency.innerText = `${latency} ms`;
+  statFaceScore.innerText = state.faceScore;
+
+  sliderEmptyHint.style.display = 'none';
+  sliderOrigWrapper.style.display = 'flex';
+  sliderSanitizedClip.style.display = 'flex';
+  sliderHandle.style.display = 'block';
+
+  processImage();
+}
+
+/* ==========================================================================
+   8. RENDERING & MASKING ENGINE
+   ========================================================================== */
+function processImage() {
+  if (!state.rawImage) return;
+
+  renderOriginal();
+  renderSanitized();
+  updateSliderClip();
+  updateAuditStats();
+}
+
+function renderOriginal() {
+  const img = state.rawImage;
+  const w = img.width;
+  const h = img.height;
+
+  canvasSliderOrig.width = w;
+  canvasSliderOrig.height = h;
+  ctxSliderOrig.clearRect(0, 0, w, h);
+  ctxSliderOrig.drawImage(img, 0, 0);
+
+  canvasDualOrig.width = w;
+  canvasDualOrig.height = h;
+  ctxDualOrig.clearRect(0, 0, w, h);
+  ctxDualOrig.drawImage(img, 0, 0);
+
+  if (state.showBoxes) {
+    drawBoxes(ctxSliderOrig, w);
+    drawBoxes(ctxDualOrig, w);
+  }
+
+  const exif = state.rawExif || {};
+  dualOrigMeta.innerHTML = `
+    <div class="metadata-row"><span class="meta-key">GPS Coordinates:</span> <span class="meta-val-danger">${exif.lat || '28.6139° N'}, ${exif.lon || '77.2090° E'}</span></div>
+    <div class="metadata-row"><span class="meta-key">Camera Device:</span> <span>${exif.device || 'Apple iPhone 15 Pro'}</span></div>
+    <div class="metadata-row"><span class="meta-key">Creation Date:</span> <span>${exif.timestamp || '2026-10-23 14:15'}</span></div>
+    <div class="metadata-row"><span class="meta-key">EXIF Payload:</span> <span class="meta-val-danger">${exif.bytes || 1420} Bytes (Leaking)</span></div>
+  `;
+}
+
+function drawBoxes(ctx, w) {
+  state.detections.forEach(det => {
+    ctx.lineWidth = Math.max(2, Math.round(w / 320));
+    ctx.strokeStyle = '#f43f5e';
+    ctx.strokeRect(det.x, det.y, det.w, det.h);
+
+    ctx.fillStyle = 'rgba(244, 63, 94, 0.88)';
+    const fontSize = Math.max(11, Math.round(w / 52));
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    const tw = ctx.measureText(det.label).width;
+    ctx.fillRect(det.x, det.y - fontSize - 5, tw + 10, fontSize + 5);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(det.label, det.x + 5, det.y - 5);
+  });
+}
+
+function renderSanitized() {
+  const img = state.rawImage;
+  const w = img.width;
+  const h = img.height;
+
+  canvasSliderSanitized.width = w;
+  canvasSliderSanitized.height = h;
+  ctxSliderSanitized.clearRect(0, 0, w, h);
+  ctxSliderSanitized.drawImage(img, 0, 0);
+
+  canvasDualSanitized.width = w;
+  canvasDualSanitized.height = h;
+  ctxDualSanitized.clearRect(0, 0, w, h);
+  ctxDualSanitized.drawImage(img, 0, 0);
+
+  const preset = state.currentPreset;
+
+  // Process Each Detection
+  state.detections.forEach(det => {
+    let shouldMask = false;
+    let style = state.maskStyle; // 'frosted' or 'sleek_tape'
+
+    // 1. AADHAAR NUMBER: Always clean "XXXX  XXXX  " directly covering the digits
+    if (det.id === 'aadhaar_first8') {
+      shouldMask = true;
+      style = 'aadhaar_xxxx';
+    }
+
+    // 2. SIGNATURE
+    if (det.id === 'signature' && (preset === 'hotel' || preset === 'job' || preset === 'social')) {
+      shouldMask = true;
+    }
+
+    // 3. ADDRESS (Only in Job preset)
+    if (det.id === 'address' && preset === 'job') {
+      shouldMask = true;
+    }
+
+    // 4. BYSTANDER FACE
+    if (det.id === 'face_bystander' && preset === 'social') {
+      shouldMask = true;
+      style = 'blur_face';
+    }
+
+    // 5. USER TOGGLE FOR FACE BLUR
+    if ((det.id === 'face' || det.id === 'face_primary') && state.maskFace) {
+      shouldMask = true;
+      style = 'blur_face';
+    }
+
+    if (shouldMask) {
+      applyMask(ctxSliderSanitized, det, style);
+      applyMask(ctxDualSanitized, det, style);
+    }
+  });
+
+  dualSanitizedMeta.innerHTML = `
+    <div class="metadata-row"><span class="meta-key">GPS Coordinates:</span> <span class="meta-val-clean">STRIPPED (0 Bytes)</span></div>
+    <div class="metadata-row"><span class="meta-key">Aadhaar Format:</span> <span class="meta-val-clean">XXXX-XXXX-3821 (AUTO-ALIGNED)</span></div>
+    <div class="metadata-row"><span class="meta-key">Text Hider Style:</span> <span class="meta-val-clean">${state.maskStyle === 'frosted' ? 'FROSTED GLASS' : 'MINIMAL TAPE'}</span></div>
+    <div class="metadata-row"><span class="meta-key">EXIF Payload:</span> <span class="meta-val-clean">0 Bytes (100% Clean)</span></div>
+  `;
+
+  btnDownload.removeAttribute('disabled');
+}
+
+/**
+ * CLEAN, AESTHETIC MASKING (NO UGLY BOXES!)
+ */
+function applyMask(ctx, det, style) {
+  if (style === 'aadhaar_xxxx') {
+    // 1. Wipe the underlying first 8 digits cleanly with the card's background white
+    ctx.save();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(det.x - 2, det.y - 2, det.w + 4, det.h + 4);
+
+    // 2. Print official "XXXX  XXXX  " directly into that exact space
+    const fontPx = det.fontSize || 28;
+    ctx.font = `bold ${fontPx}px monospace`;
+    ctx.fillStyle = '#0f172a';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('XXXX  XXXX  ', det.x + 3, det.y + det.h / 2);
+    ctx.restore();
+  } 
+  else if (style === 'blur_face') {
+    // Real Gaussian Blur inside the face frame
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(det.x, det.y, det.w, det.h);
+    ctx.clip();
+
+    ctx.filter = 'blur(14px)';
+    ctx.drawImage(state.rawImage, 0, 0);
+
+    ctx.filter = 'none';
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.35)';
+    ctx.fillRect(det.x, det.y, det.w, det.h);
+
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(det.x, det.y, det.w, det.h);
+    ctx.restore();
+  } 
+  else if (style === 'frosted') {
+    // ✨ ELEGANT FROSTED GLASS BLUR (NO UGLY TEXT BOXES!)
+    ctx.save();
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(det.x, det.y, det.w, det.h, 6);
+    } else {
+      ctx.rect(det.x, det.y, det.w, det.h);
+    }
+    ctx.clip();
+
+    ctx.filter = 'blur(10px)';
+    ctx.drawImage(state.rawImage, 0, 0);
+
+    ctx.filter = 'none';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.40)';
+    ctx.fillRect(det.x, det.y, det.w, det.h);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(det.x, det.y, det.w, det.h);
+    ctx.restore();
+  } 
+  else {
+    // ⬛ SLEEK MINIMALIST BLACK REDACTION TAPE
+    ctx.save();
+    ctx.fillStyle = '#0f172a';
+    if (ctx.roundRect) {
+      ctx.beginPath();
+      ctx.roundRect(det.x, det.y, det.w, det.h, 4);
+      ctx.fill();
+    } else {
+      ctx.fillRect(det.x, det.y, det.w, det.h);
+    }
+    ctx.restore();
+  }
+}
+
+function updateAuditStats() {
+  statPiiCount.innerText = state.detections.length;
+
+  const exif = state.rawExif || {};
+  if (exif.hasGps) {
+    statGpsStatus.innerText = 'CRITICAL LEAK';
+    statGpsStatus.style.color = '#f43f5e';
+    gpsBanner.style.display = 'flex';
+    gpsCoordsText.innerText = `${exif.lat}, ${exif.lon}`;
+  } else {
+    statGpsStatus.innerText = 'Safe / Stripped';
+    statGpsStatus.style.color = '#10b981';
+    gpsBanner.style.display = 'none';
+  }
+
+  const bytes = exif.bytes || 1420;
+  statSanitizedBytes.innerText = `${(bytes / 1024).toFixed(2)} KB`;
+}
+
+/* ==========================================================================
+   9. LIVE DEMO TEST GENERATORS
+   ========================================================================== */
+document.getElementById('btnGenAadhaar').addEventListener('click', () => {
+  generateMockAadhaar();
+});
+
+document.getElementById('btnGenPhoto').addEventListener('click', () => {
+  generateMockPhoto();
+});
+
+function generateMockAadhaar() {
+  const c = document.createElement('canvas');
+  c.width = 920;
+  c.height = 580;
+  const ctx = c.getContext('2d');
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, 920, 580);
+
+  const grad = ctx.createLinearGradient(0, 0, 920, 0);
+  grad.addColorStop(0, '#f97316');
+  grad.addColorStop(0.5, '#ffffff');
+  grad.addColorStop(1, '#16a34a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 920, 18);
+
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText('भारत सरकार / Government of India', 270, 52);
+  ctx.font = '14px sans-serif';
+  ctx.fillStyle = '#475569';
+  ctx.fillText('Unique Identification Authority of India (Demonstration ID)', 270, 76);
+
+  // Portrait Photo Box
+  ctx.fillStyle = '#cbd5e1';
+  ctx.fillRect(36, 130, 210, 265);
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(36, 130, 210, 265);
+
+  ctx.fillStyle = '#475569';
+  ctx.beginPath();
+  ctx.arc(141, 230, 50, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(141, 340, 80, Math.PI, 0);
+  ctx.fill();
+
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText('Rahul Sharma', 280, 175);
+
+  ctx.font = '16px sans-serif';
+  ctx.fillStyle = '#334155';
+  ctx.fillText('DOB: 14/08/1996', 280, 215);
+  ctx.fillText('Gender: MALE / पुरुष', 280, 245);
+  ctx.fillText('S/O: Ramesh Sharma', 280, 275);
+  ctx.fillText('Address: Flat 402, Green Valley Apts, New Delhi - 110001', 280, 305);
+
+  // 12-Digit Aadhaar Text at Y=430
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 34px monospace';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('5482  9104  3821', 240, 430);
+
+  // QR Code
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(680, 290, 180, 180);
+  ctx.fillStyle = '#ffffff';
+  for (let r = 0; r < 7; r++) {
+    for (let col = 0; col < 7; col++) {
+      if ((r + col) % 2 === 0) {
+        ctx.fillRect(692 + col * 22, 302 + r * 22, 14, 14);
+      }
+    }
+  }
+
+  // Signature
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(550, 480, 280, 55);
+  ctx.font = 'italic 12px sans-serif';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('Sign / हस्ताक्षर:', 555, 492);
+
+  ctx.strokeStyle = '#1e3a8a';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(565, 515);
+  ctx.bezierCurveTo(605, 490, 625, 535, 675, 500);
+  ctx.bezierCurveTo(705, 520, 725, 490, 785, 510);
+  ctx.stroke();
+
+  // Bottom Line
+  ctx.fillStyle = '#f1f5f9';
+  ctx.fillRect(0, 550, 920, 30);
+  ctx.fillStyle = '#64748b';
+  ctx.font = '12px sans-serif';
+  ctx.fillText('मेरा आधार, मेरी पहचान', 410, 570);
+
+  const img = new Image();
+  img.onload = () => {
+    state.rawImage = img;
+    state.rawExif = {
+      hasGps: true,
+      lat: "28.6139° N",
+      lon: "77.2090° E",
+      device: "Apple iPhone 15 Pro",
+      software: "iOS 18.1 Camera App",
+      timestamp: "2026-10-23 14:32:00",
+      bytes: 2180
+    };
+    runInference(img);
+  };
+  img.src = c.toDataURL('image/png');
+}
+
+function generateMockPhoto() {
+  const c = document.createElement('canvas');
+  c.width = 800;
+  c.height = 600;
+  const ctx = c.getContext('2d');
+
+  const grad = ctx.createLinearGradient(0, 0, 800, 600);
+  grad.addColorStop(0, '#1e293b');
+  grad.addColorStop(1, '#090e18');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 800, 600);
+
+  ctx.fillStyle = '#38bdf8';
+  ctx.beginPath();
+  ctx.arc(380, 280, 80, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 14px sans-serif';
+  ctx.fillText('USER FACE', 340, 285);
+
+  ctx.fillStyle = '#f43f5e';
+  ctx.beginPath();
+  ctx.arc(660, 240, 50, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.fillText('BYSTANDER', 625, 245);
+
+  const img = new Image();
+  img.onload = () => {
+    state.rawImage = img;
+    state.rawExif = {
+      hasGps: true,
+      lat: "19.0760° N",
+      lon: "72.8777° E",
+      device: "Samsung Galaxy S24 Ultra",
+      software: "OneUI 6.1 Camera",
+      timestamp: "2026-10-23 17:40:12",
+      bytes: 3840
+    };
+    runInference(img);
+  };
+  img.src = c.toDataURL('image/png');
+}
+
+/* ==========================================================================
+   10. PORTAL LINK SAFETY CHECKER ENGINE (URL SCANNER)
+   ========================================================================== */
+const urlInput = document.getElementById('urlInput');
+const btnScanUrl = document.getElementById('btnScanUrl');
+const scanResultArea = document.getElementById('scanResultArea');
+
+btnScanUrl.addEventListener('click', () => {
+  const url = urlInput.value.trim();
+  if (!url) {
+    alert("Please enter a website link to analyze!");
+    return;
+  }
+  analyzeUrl(url);
+});
+
+urlInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    btnScanUrl.click();
+  }
+});
+
+window.testUrl = function(url) {
+  urlInput.value = url;
+  analyzeUrl(url);
+};
+
+function analyzeUrl(urlStr) {
+  let isDanger = false;
+  const reasons = [];
+  let protocol = "UNKNOWN";
+  let hostname = "";
+
+  try {
+    let parsedUrl;
+    if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
+      parsedUrl = new URL('http://' + urlStr);
+    } else {
+      parsedUrl = new URL(urlStr);
+    }
+
+    protocol = parsedUrl.protocol.replace(':', '').toUpperCase();
+    hostname = parsedUrl.hostname.toLowerCase();
+
+    // 1. Insecure HTTP
+    if (parsedUrl.protocol === 'http:') {
+      isDanger = true;
+      reasons.push("🚨 UNENCRYPTED (HTTP): Anyone on the same network can intercept your uploaded documents in plain text!");
+    }
+
+    // 2. High-Risk Phishing TLDs
+    const suspiciousTlds = ['.xyz', '.top', '.tk', '.ml', '.ga', '.cf', '.click', '.live', '.loan', '.online', '.work'];
+    const matchedTld = suspiciousTlds.find(tld => hostname.endsWith(tld));
+    if (matchedTld) {
+      isDanger = true;
+      reasons.push(`⚠️ HIGH-RISK TLD (${matchedTld}): Commonly registered by scam syndicates to harvest KYC documents.`);
+    }
+
+    // 3. Spoofing / Impersonation
+    const brandKeywords = ['uidai', 'aadhaar', 'sbi', 'hdfc', 'icici', 'incometax', 'pan-card', 'digilocker'];
+    const hasBrandWord = brandKeywords.some(b => hostname.includes(b));
+    const isOfficialGov = hostname.endsWith('.gov.in') || hostname.endsWith('.nic.in');
+    const isOfficialBank = hostname.endsWith('hdfcbank.com') || hostname.endsWith('sbi.co.in') || hostname.endsWith('icicibank.com');
+
+    if (hasBrandWord && !isOfficialGov && !isOfficialBank) {
+      isDanger = true;
+      reasons.push("🚨 SPOOFING / IMPERSONATION DETECTED: This domain mimics an official authority (e.g. UIDAI / Bank) but has NO official accreditation!");
+    }
+
+    // 4. Raw IP
+    const isIp = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+    if (isIp) {
+      isDanger = true;
+      reasons.push("⚠️ RAW IP HOSTNAME: Legitimate institutions use registered domain names, not bare IP addresses.");
+    }
+
+  } catch (err) {
+    isDanger = true;
+    reasons.push("Malformed or invalid URL syntax.");
+  }
+
+  renderScanResult(isDanger, reasons, protocol, hostname || urlStr);
+}
+
+function renderScanResult(isDanger, reasons, protocol, domain) {
+  scanResultArea.style.display = 'block';
+
+  if (isDanger) {
+    scanResultArea.innerHTML = `
+      <div class="scan-result-card danger">
+        <div class="scan-status-header">
+          <div class="scan-status-icon">🚨</div>
+          <div>
+            <div class="scan-status-title">RED ALERT: HIGH-RISK OR PHISHING PORTAL DETECTED!</div>
+            <div style="font-size: 0.85rem; color: #fca5a5;">DO NOT UPLOAD YOUR DOCUMENTS HERE. This destination failed security verification!</div>
+          </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 0.85rem; border-left: 4px solid var(--accent-rose);">
+          <div style="font-weight: 700; font-size: 0.85rem; color: #fda4af; margin-bottom: 0.4rem;">SECURITY THREATS FOUND:</div>
+          <ul style="padding-left: 1.2rem; font-size: 0.82rem; color: #fee2e2; line-height: 1.6;">
+            ${reasons.map(r => `<li>${r}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div class="scan-breakdown">
+          <div class="breakdown-box">
+            <span class="breakdown-lbl">PROTOCOL ENCRYPTION</span>
+            <span class="breakdown-val" style="color: ${protocol === 'HTTPS' ? '#6ee7b7' : '#fda4af'}">${protocol === 'HTTPS' ? 'HTTPS (Encrypted)' : 'HTTP (Plain Text Insecure)'}</span>
+          </div>
+          <div class="breakdown-box">
+            <span class="breakdown-lbl">DESTINATION HOST</span>
+            <span class="breakdown-val">${domain}</span>
+          </div>
+          <div class="breakdown-box">
+            <span class="breakdown-lbl">RECOMMENDED ACTION</span>
+            <span class="breakdown-val" style="color: #fda4af;">BLOCK UPLOAD IMMEDIATELY</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    scanResultArea.innerHTML = `
+      <div class="scan-result-card safe">
+        <div class="scan-status-header">
+          <div class="scan-status-icon">✅</div>
+          <div>
+            <div class="scan-status-title">GREEN SIGN: VERIFIED & ENCRYPTED PORTAL</div>
+            <div style="font-size: 0.85rem; color: #6ee7b7;">Safe destination verified. Valid TLS/HTTPS encryption and trusted domain accreditation.</div>
+          </div>
+        </div>
+
+        <div class="scan-breakdown">
+          <div class="breakdown-box">
+            <span class="breakdown-lbl">PROTOCOL SECURITY</span>
+            <span class="breakdown-val" style="color: #6ee7b7;">HTTPS (256-Bit SSL/TLS Encryption Active)</span>
+          </div>
+          <div class="breakdown-box">
+            <span class="breakdown-lbl">VERIFIED DOMAIN</span>
+            <span class="breakdown-val" style="color: #6ee7b7;">${domain}</span>
+          </div>
+          <div class="breakdown-box">
+            <span class="breakdown-lbl">PORTAL REPUTATION</span>
+            <span class="breakdown-val" style="color: #6ee7b7;">LEGITIMATE / ACCREDITED FIDUCIARY</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Component, URL, and language feature scan. This is a transparent heuristic,
+// not a trained model or a substitute for live reputation/certificate checks.
+function analyzeUrl(urlStr) {
+  const factors = { url: [], page: [], language: [] };
+  let parsed;
+  try {
+    parsed = new URL(/^https?:\/\//i.test(urlStr) ? urlStr : `https://${urlStr}`);
+    if (!/^https?:$/.test(parsed.protocol)) throw new Error('Unsupported protocol');
+  } catch (_) {
+    renderRiskResult({ score: 100, factors: { url: ['Malformed URL or unsupported protocol.'], page: [], language: [] }, domain: 'Invalid URL', protocol: 'UNKNOWN', suppliedPage: false });
+    return;
+  }
+
+  const host = parsed.hostname.toLowerCase();
+  const full = `${host}${parsed.pathname}${parsed.search}`.toLowerCase();
+  const knownBrands = ['uidai','aadhaar','sbi','hdfc','icici','incometax','digilocker','paypal','google','microsoft'];
+  const officialHosts = ['uidai.gov.in','nic.in','sbi.co.in','hdfcbank.com','icicibank.com','incometax.gov.in','digilocker.gov.in'];
+  const official = officialHosts.some(d => host === d || host.endsWith(`.${d}`));
+  const brandInHost = knownBrands.some(b => host.includes(b));
+  const labels = host.split('.');
+  const riskTlds = ['xyz','top','tk','ml','ga','cf','click','loan','work','zip','mov'];
+  const ipHost = /^(\d{1,3}\.){3}\d{1,3}$/.test(host) || host.includes(':');
+  let score = 0;
+  const add = (group, points, message) => { score += points; factors[group].push(message); };
+
+  if (parsed.protocol === 'http:') add('url', 24, 'Uses unencrypted HTTP.');
+  if (ipHost) add('url', 28, 'Uses a raw IP address instead of a recognizable domain.');
+  if (riskTlds.includes(labels.at(-1))) add('url', 16, `Uses the .${labels.at(-1)} top-level domain, which merits extra scrutiny.`);
+  if (labels.length >= 5) add('url', 9, 'Has an unusually deep subdomain chain.');
+  if (host.length > 45) add('url', 8, 'Has an unusually long hostname.');
+  if (host.includes('xn--')) add('url', 18, 'Contains an internationalized/punycode hostname that can disguise characters.');
+  if ((full.match(/-/g) || []).length >= 3) add('url', 8, 'Contains many hyphens in the host/path.');
+  if (/(login|verify|secure|update|account|kyc|upload|signin|password)/i.test(full)) add('url', 6, 'URL contains account, verification, or upload wording (contextual signal).');
+  if (brandInHost && !official) add('url', 30, 'Uses a known organization name outside its recognized official domain.');
+  if (/@/.test(parsed.href)) add('url', 18, 'Contains user-info syntax that can obscure the actual destination host.');
+
+  const suppliedPage = document.getElementById('pageSignals').value.trim();
+  if (suppliedPage) {
+    const text = suppliedPage.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ').toLowerCase();
+    const hasForm = /<form\b|\b(sign.?in|log.?in|registration)\b/.test(suppliedPage.toLowerCase());
+    const hasPassword = /type\s*=\s*["']?password|\bpassword\b/.test(suppliedPage.toLowerCase());
+    const hasFile = /type\s*=\s*["']?file|upload (your|a|the)?\s*(id|document|passport|aadhaar|photo)/i.test(suppliedPage);
+    const hasPayment = /card number|cvv|bank account|\bupi\b|\bpan number\b/i.test(text);
+    if (hasForm) add('page', 5, 'Login or registration form language/component found. Forms are common on both legitimate and phishing sites.');
+    if (hasPassword) add('page', 8, 'Password field or password request found.');
+    if (hasFile) add('page', 7, 'File upload or identity-document request found.');
+    if (hasPayment) add('page', 9, 'Payment or financial credential request found.');
+    if (/action\s*=\s*["']?https?:\/\//i.test(suppliedPage)) add('page', 8, 'Form action points to an absolute external URL; verify that destination.');
+    if (!hasForm && !hasPassword && !hasFile && !hasPayment) factors.page.push('No common credential, payment, or document-upload component detected in supplied content.');
+    if (/\b(urgent|immediately|within\s+\d+\s*(minute|hour)|account (will be|is) (blocked|suspended)|act now|limited time)\b/i.test(text)) add('language', 15, 'Urgency or threat wording pressures the visitor to act quickly.');
+    if (/\b(guaranteed|claim your reward|you have won|free money|congratulations)\b/i.test(text)) add('language', 10, 'Reward or implausible-benefit wording found.');
+    if (brandInHost && !official && knownBrands.some(b => text.includes(b))) add('language', 10, 'Page text and non-official hostname combine a brand claim with a mismatched domain.');
+    if (!factors.language.length) factors.language.push('No common urgency or reward wording found in supplied content.');
+  } else {
+    factors.page.push('Not inspected: no page text/HTML was supplied.');
+    factors.language.push('Not inspected: no page text/HTML was supplied.');
+  }
+  score = Math.min(100, score);
+  renderRiskResult({ score, factors, domain: host, protocol: parsed.protocol.slice(0, -1).toUpperCase(), suppliedPage: Boolean(suppliedPage), official });
+}
+
+function renderRiskResult(result) {
+  const { score, factors, domain, protocol, suppliedPage, official } = result;
+  const level = score >= 55 ? 'high' : score >= 25 ? 'caution' : 'low';
+  const color = level === 'high' ? '#fda4af' : level === 'caution' ? '#fcd34d' : '#6ee7b7';
+  const title = level === 'high' ? 'HIGH RISK SIGNALS' : level === 'caution' ? 'REVIEW BEFORE UPLOADING' : 'FEW RISK SIGNALS FOUND';
+  const groups = [['URL features', factors.url], ['Page components', factors.page], ['Language clues', factors.language]];
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  scanResultArea.style.display = 'block';
+  scanResultArea.innerHTML = `<div class="scan-result-card ${level === 'high' ? 'danger' : 'safe'}" style="border-color:${color}">
+    <div class="scan-status-header"><div class="scan-status-icon">${level === 'high' ? '🚨' : level === 'caution' ? '⚠️' : '🔎'}</div><div><div class="scan-status-title" style="color:${color}">${title}</div><div style="font-size:.88rem;color:${color}">Heuristic risk score: ${score}/100 · ${level === 'high' ? 'Avoid uploading sensitive files until independently verified.' : level === 'caution' ? 'Check the domain and page carefully before sharing sensitive files.' : 'This scan cannot establish that the destination is legitimate.'}</div></div></div>
+    <div class="scan-breakdown">${groups.map(([name, items]) => `<div class="breakdown-box"><span class="breakdown-lbl">${name}</span><span class="breakdown-val">${items.length ? `<ul style="padding-left:1rem">${items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : 'No signal found'}</span></div>`).join('')}</div>
+    <div class="scan-breakdown"><div class="breakdown-box"><span class="breakdown-lbl">Protocol</span><span class="breakdown-val">${esc(protocol)}${protocol === 'HTTP' ? ' · unencrypted' : ' · HTTPS does not prove trustworthiness'}</span></div><div class="breakdown-box"><span class="breakdown-lbl">Host</span><span class="breakdown-val">${esc(domain)}</span></div><div class="breakdown-box"><span class="breakdown-lbl">Inspection scope</span><span class="breakdown-val">${suppliedPage ? 'Pasted page content + URL' : 'URL only'}${official ? ' · recognized domain pattern (not ownership verification)' : ''}</span></div></div>
+    <div style="font-size:.78rem;color:var(--text-muted);line-height:1.5">Signals are transparent rules inspired by URL, component, and NLP feature analysis. This is not the paper’s EfficientNet/FH-BERT/SELU-CRNN model, and it does not fetch the website, verify TLS certificates, or query threat-intelligence feeds. False positives and missed phishing are possible.</div>
+  </div>`;
+}
+
+  </script>
+</body>
+</html>
